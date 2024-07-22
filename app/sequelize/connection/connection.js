@@ -9,7 +9,12 @@ const sequelize = new Sequelize("dbname", "u", "p", {
         max: 1,
         idle: 1000
     },
-    dialectOptions:{}
+    dialectOptions:{
+        ssl: {
+            //require: true,
+            rejectUnauthorized: false,
+        },
+    }
 })
 try {
     await sequelize.authenticate();
