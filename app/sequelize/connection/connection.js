@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
-const sequelize = new Sequelize("MyTestDB", "avnadmin", "AVNS_kyDeAGg6792v4Rv16KN", {
+const sequelize = new Sequelize("dbname", "u", "p", {
     dialect: 'postgres',
-    host: 'mypostgres-vitestproject.i.aivencloud.com',
+    host: 'hname',
     protocol: 'postgres',
     port: 17452,
     pool: {
