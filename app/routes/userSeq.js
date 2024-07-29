@@ -1,8 +1,9 @@
 import express from "express";
 const userSeqRoute = express.Router();
 import { userSeqModel } from "../sequelize/model/user.js";
-import { Op } from "sequelize";
+import { Op, QueryTypes } from "sequelize";
 import sequelize from "../sequelize/connection/connection.js";
+import { orderModel } from "../sequelize/model/order.js";
 
 userSeqRoute.post("/create", async (req, res) => {
     //await userSeqModel.sync({});
@@ -12,7 +13,7 @@ userSeqRoute.post("/create", async (req, res) => {
 })
 
 userSeqRoute.post("/bulkCreate", async (req, res) => {
-    await userSeqModel.sync();
+    //await userSeqModel.sync();
     const userDetails = userSeqModel.bulkCreate(req.body, {
         validate: true // bulkCreate don't check validation bydefault until mention here
     });
@@ -189,5 +190,103 @@ userSeqRoute.get("/moreWhere", async (req, res) => {
     res.send(userDetails);   
 })
 
+
+userSeqRoute.post('/transaction', async (req, res) => {
+    const t = await sequelize.transaction();
+
+    try {
+
+        const payload = {
+            "name" : "ravi",
+            "surname" : "kumar",
+            "age" : 26,
+            "email" : "ravi@gmail.com",
+            "city" :  "pune",
+            "country" : "India"
+        }
+        console.log("after payload")
+        const saveResult = await userSeqModel.create(payload, { transaction: t });
+        console.log("after cretae", saveResult)
+        const result = await userSeqModel.findAll(
+            { 
+                where: {
+                    email : "ravi@gmail.com", 
+                },
+                transaction : t 
+            }
+        );
+        await t.commit()
+        res.send(result);
+
+    } catch(err) {
+        console.log("err : ", err);
+        await t.rollback();
+        res.send(err);
+    }
+})  
+
+
+userSeqRoute.get("/rawQuery", async (req, res) => {
+
+    /*
+        Query Types
+        Sequelize supports different query types that can be specified using the type option. Some of the query types include:
+
+        SELECT: For SELECT queries.
+        INSERT: For INSERT queries.
+        UPDATE: For UPDATE queries.
+        DELETE: For DELETE queries.
+        RAW: For raw queries that are not one of the above.
+    */
+
+    console.log("Inside raw query")
+    const result = await sequelize.query("SELECT * FROM Users"
+    //, {
+    //     //model: userSeqModel
+    //     type: QueryTypes.SELECT,
+    //     model: userSeqModel
+    // }
+    )
+    console.log("After raw query", result)
+    res.send(result)
+
+})
+
+userSeqRoute.get("/queryInterface", async (req, res) => {
+    console.log("viiii")
+    const queryInterface = sequelize.getQueryInterface();
+    const result = await queryInterface.bulkInsert('`mySchema`.`Users`', [{
+        "name" : "prakash",
+        "surname" : "singh",
+        "age" : 53,
+        "email" : "prakash@gmail.com",
+        "city" :  "pune",
+        "country" : "India"
+    }, {
+        "name" : "swapnil",
+        "surname" : "sharma",
+        "age" : 45,
+        "email" : "swapnil@gmail.com",
+        "city" :  "mumbai",
+        "country" : "India"
+    }])
+    res.send(result)
+
+})
+
+userSeqRoute.get("/associate", async (req, res) => {
+    console.log("-------hh")
+    const result = await userSeqModel.findAll({
+        include: [
+            {
+                model: orderModel,
+                as: "orders",
+                attributes: ['name', 'price']
+            }
+        ]
+    });
+    console.log(result);
+    res.send(result);
+})
 
 export { userSeqRoute };
