@@ -1,6 +1,7 @@
 import express from "express";
 const userRoute = express.Router();
 import { User, UserViewModel } from "../model/userSchema.js"
+import { dbConnect } from "../db/mongoose.js";
 
 
 // Save one records
@@ -103,6 +104,37 @@ userRoute.get("/filter", async ( req, res ) => {
                     .exec();
                     
     res.send(result)
+})
+
+userRoute.get("/transaction", async (req, res) => {
+    const session = await User.startSession();
+    await session.startTransaction();
+
+    try {
+        const createQuery = new User();
+        createQuery.userId = 15;
+        createQuery.name = 'Chinnu';
+        createQuery.surname = 'patidar'
+        createQuery.age = 21;
+        createQuery.phone = '9383829384';
+        createQuery.email = 'chinnu@gmail.com';
+        await createQuery.save();
+
+        const result = await User.finds( { userIds : 16 });
+
+        await session.commitTransaction();
+
+        res.send(result)
+    } catch (err) {
+        console.log("err : ", err)
+        await session.abortTransaction()
+        req.send(err);
+    } finally {
+        await session.endSession();
+    }
+
+
+
 })
 
 

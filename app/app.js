@@ -1,37 +1,37 @@
 import express from "express";
 const app = express();
-//import { dbConnect } from "./db/mongoose.js"
+import { dbConnect } from "./db/mongoose.js"
 import bodyParser from "body-parser";
 // import sequelize from "./sequelize/connection/connection.js";
 // import { userSeqModel } from "./sequelize/model/user.js";
 // import { orderModel } from "./sequelize/model/order.js";
 
 // postgress raw connection with pg module
-import { userRoute } from "./postgres/route/userRoute.js";
-
+// import { userSeqRoute } from "./postgres/route/userRoute.js";
+//app.use(dbConnect);
 
 app.use(bodyParser.json())
 const PORT = 3000;
 
-app.use("/pg/user", userRoute);
+// app.use("/pg/user", userSeqRoute);
 
 
 
 // import { orderRoute } from "./routes/order.js";
 // import { nodeRoute } from "./routes/node.js";
-// import { userRoute } from "./routes/user.js";
+ import { userRoute } from "./routes/user.js";
 // import { userSeqRoute } from "./routes/userSeq.js";
 // import { orderSeqRoute } from "./routes/orderSeq.js";
 // import { BelongsToMany } from "sequelize";
-// //app.use(dbConnect);
+ 
 // app.get("/", (req, res) => {
 //       res.send("Hello World.....")
 // })
 
 // app.use("/order", orderRoute)
 // app.use("/node", nodeRoute)
-// app.use("/user", userRoute)
-// app.use("/seq/user", userSeqRoute);
+ app.use("/user", userRoute)
+//  app.use("/seq/user", userSeqRoute);
 // app.use("/seq/order", orderSeqRoute);
 
 
